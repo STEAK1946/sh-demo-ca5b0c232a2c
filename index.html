@@ -239,6 +239,23 @@ body:not(.is-logins) .logins-only{display:none!important}
 .rov{min-height:46px;display:flex;align-items:center;justify-content:center;gap:4px;border:1px dashed #d1d5db;border-radius:10px;background:#f9fafb;font-size:18px;font-weight:700}
 .lock{font-size:13px;opacity:.8}
 .pgrid.g4{grid-template-columns:repeat(4,1fr)}
+/* preview2: On hand stepper (− / number / +), Out of stock, item status chips, not-counted filter, vendor progress badge */
+.pgrid.g2{grid-template-columns:repeat(2,1fr)}.pgrid.g3{grid-template-columns:repeat(3,1fr)}
+.pgrid .qcell{grid-column:1/-1}
+.qstep{display:flex;gap:6px;align-items:stretch}
+.qstep .sbtn{min-width:54px;min-height:50px;font-size:26px;font-weight:700;padding:0;line-height:1;border-radius:12px}
+.qstep input,.qstep .rov{flex:1;min-width:0;min-height:50px;font-size:20px}
+.qstep .oos{min-height:50px;font-size:13px;font-weight:700;padding:0 10px;white-space:nowrap;color:#b91c1c;border-color:#fca5a5;background:#fff5f5}
+.qstep button:disabled{opacity:.4}
+.pill.cs-nc{background:#e5e7eb;color:#4b5563}.pill.cs-out{background:#dc2626;color:#fff}.pill.cs-low{background:#f59e0b;color:#fff}.pill.cs-ok{background:#16a34a;color:#fff}
+.pitem.nc{border-left:4px solid #9ca3af}
+.vprog{display:flex;align-items:center;gap:8px;margin-top:8px}
+.vprog .vpbar{flex:1;height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+.vprog .vpfill{height:100%;background:#2563eb;border-radius:999px}
+.vprog.done .vpfill{background:#16a34a}
+.vprog .vpb{font-size:13px;font-weight:700;border-radius:999px;padding:3px 10px;background:#dbeafe;color:#1e40af;white-space:nowrap}
+.vprog.done .vpb{background:#dcfce7;color:#166534}
+.rowtools.wrap{flex-wrap:wrap;row-gap:8px}.rowtools.wrap input[type=search]{flex:1 1 100%}
 .ulink{background:none;border:0;padding:2px 4px;margin-left:2px;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;min-height:0}
 .upick{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
 .upick label{margin:0;font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
@@ -303,7 +320,7 @@ header{top:var(--demo-h);padding-top:12px}
     <div id="parInfo"></div>
     <div id="parMgr"></div>
     <div id="parSummary" class="note"></div>
-    <div class="rowtools"><input id="parSearch" type="search" placeholder="Search this vendor"><label class="chk"><input type="checkbox" id="parNeedOnly"> Needs order</label></div>
+    <div class="rowtools wrap"><input id="parSearch" type="search" placeholder="Search this vendor"><label class="chk"><input type="checkbox" id="parNeedOnly"> Needs order</label><label class="chk"><input type="checkbox" id="parNcOnly"> <span id="parNcLabel">Not counted</span></label></div>
     <div id="parList"></div>
     <div id="parActions"></div>
   </div>
@@ -2238,7 +2255,7 @@ function notesClick(e, p, save, rerender) {
 }
 function vendorCard(v) {
   const its = vendorItems(v.id), s = sessionFor(v.id);
-  const counted = its.filter(i => hasNum(i.qty)).length, need = orderLines(v.id).length, pars = its.filter(i => hasNum(i.par)).length;
+  const counted = its.filter(isCounted).length, need = orderLines(v.id).length, pars = its.filter(i => hasNum(i.par)).length;
   if (!hasParSheet(v)) {
     return '<div class="card vcard nopar" data-vid="' + esc(v.id) + '"><div class="item-name">' + esc(v.name) + groupChip(v) + '<span class="pill kind">' + esc(KIND_LABEL[v.kind] || v.kind) + '</span></div>' +
       vendorContactLine(v) + '<div class="meta">' + esc(v.supplies) + '</div>' +
@@ -2250,8 +2267,15 @@ function vendorCard(v) {
     vendorContactLine(v) + '<div class="meta">' + esc(v.supplies || KIND_LABEL[v.kind] || '') + '</div></div>' +
     '<div class="qty">' + its.length + '<br><small>items</small></div></div>' +
     '<div class="meta helper">' + counted + ' of ' + its.length + ' counted · ' + pars + ' with a target · ' + need + ' to order' + (s.exists ? ' · count #' + s.round : '') + '</div>' +
+    vendorProgress(its.length, counted, s) +
     (countEditable(s) ? '' : '<div class="meta helper vlock">🔒 Counts are locked. You can still look.</div>') +
     '<div class="actions"><button class="btn primary vbtn" type="button" data-act="inv" aria-label="On hand for ' + esc(v.name) + '">On hand</button>' + (isMgr() || need ? '<button class="btn small" type="button" data-act="order">Order summary (' + need + ')</button>' : '') + '</div></div>';
+}
+/* preview2: progress badge + bar on a vendor card ("12/30 counted"; "Finished" once the count is submitted) */
+function vendorProgress(total, counted, s) {
+  const done = !countEditable(s), pct = total ? Math.round(counted / total * 100) : 0;
+  return '<div class="vprog' + (done ? ' done' : '') + '" data-prog="1"><div class="vpbar" role="progressbar" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + counted + '"><div class="vpfill" style="width:' + (done ? 100 : pct) + '%"></div></div>' +
+    '<span class="vpb">' + (done ? '✓ Finished' : counted + '/' + total + ' counted') + '</span></div>';
 }
 $('vendorList').addEventListener('click', e => {
   const fc = e.target.closest('button[data-gf]'); if (fc) { vGroupFilter = fc.getAttribute('data-gf'); renderVendorList(); return; }
@@ -2334,6 +2358,28 @@ function numBox(f, v, ph, label, editable, lockTitle) {
   if (!editable) return '<div class="ro"><label>' + label + '</label><div class="rov" data-ro="' + f + '"' + (lockTitle ? ' title="' + esc(lockTitle) + '"' : '') + '>' + (lockTitle ? '<span class="lock" aria-label="locked">🔒</span>' : '') + (hasNum(v) ? esc(v) : '<span class="meta">' + esc(ph) + '</span>') + '</div></div>';
   return '<div><label>' + label + '</label><input data-f="' + f + '" type="number" inputmode="decimal" min="0" step="any" value="' + (hasNum(v) ? esc(v) : '') + '" placeholder="' + esc(ph) + '" aria-label="' + label + '"></div>';
 }
+/* preview2: "not counted" = no number, or the 0 a reset leaves behind (reset writes qty 0 + countedAt null) */
+function isCounted(it) { return hasNum(it.qty) && !!it.countedAt; }
+function countChip(it) {
+  if (!isCounted(it)) return '<span class="pill cs-nc">Not counted</span>';
+  const q = Number(it.qty);
+  if (q === 0) return '<span class="pill cs-out">Out</span>';
+  if (hasNum(it.par) && q < Number(it.par)) return '<span class="pill cs-low">Below target</span>';
+  return '<span class="pill cs-ok">OK</span>';
+}
+/* On hand box with − / + and Out of stock. The input stays a plain number field; the buttons only set its value and fire
+   the same "change" the keyboard does, so saving goes through the one qty handler below. Locked: read-only + disabled. */
+function qtyBox(it, editable) {
+  const dis = editable ? '' : ' disabled', nm = esc(it.name);
+  const shown = isCounted(it) || (hasNum(it.qty) && Number(it.qty) !== 0) ? it.qty : null;
+  const mid = editable
+    ? '<input data-f="qty" type="number" inputmode="decimal" min="0" step="any" value="' + (hasNum(shown) ? esc(shown) : '') + '" placeholder="—" aria-label="On hand">'
+    : '<div class="rov" data-ro="qty" title="Counts locked"><span class="lock" aria-label="locked">🔒</span>' + (hasNum(it.qty) ? esc(it.qty) : '<span class="meta">—</span>') + '</div>';
+  return '<div class="qcell"><label>On hand</label><div class="qstep">' +
+    '<button class="btn sbtn" type="button" data-step="-1" aria-label="One less ' + nm + '"' + dis + '>−</button>' + mid +
+    '<button class="btn sbtn" type="button" data-step="1" aria-label="One more ' + nm + '"' + dis + '>+</button>' +
+    '<button class="btn oos" type="button" data-act="oos" aria-label="Out of stock: ' + nm + '"' + dis + '>Out of<br>stock</button></div></div>';
+}
 function statusBanner(v, s) {
   const by = (n, t) => (n ? ' by ' + esc(n) : '') + (t ? ' · ' + esc(fmt(t)) : '');
   if (s.status === 'open') return '<div class="sbar open">Counting open' + (s.exists ? ' · count #' + s.round : '') + '. Enter on-hand counts, then tap <b>Submit count</b>.</div>';
@@ -2364,10 +2410,12 @@ function renderPar() {
     '<li>Type in the Order box to override it; <b>use auto</b> puts the automatic amount back' + (frozen(s) ? ' (locked: this order is complete).' : '.') + '</li></ul></details>' +
     (guide ? '<p class="note">Order guide: items follow the Guide # you enter (1, 2, 3…). Items without a number are listed last, A–Z.</p>' : '') : '';
   const all = vendorItems(v.id);
-  const q = $('parSearch').value.trim().toLowerCase(), needOnly = $('parNeedOnly').checked;
+  const q = $('parSearch').value.trim().toLowerCase(), needOnly = $('parNeedOnly').checked, ncOnly = $('parNcOnly').checked;
+  const ncN = all.filter(i => !isCounted(i)).length;
+  $('parNcLabel').textContent = 'Not counted (' + ncN + ')';
   const need = all.filter(i => finalQty(i) > 0);
   $('parSummary').textContent = all.length + ' items · ' + all.filter(i => hasNum(i.qty)).length + ' counted · ' + all.filter(i => hasNum(i.par)).length + ' with a target · ' + all.filter(noPar).length + ' no target · ' + need.length + ' to order';
-  const list = all.filter(i => (!q || (i.name + ' ' + i.itemNo + ' ' + i.category + ' ' + i.pack).toLowerCase().indexOf(q) >= 0) && (!needOnly || finalQty(i) > 0));
+  const list = all.filter(i => (!q || (i.name + ' ' + i.itemNo + ' ' + i.category + ' ' + i.pack).toLowerCase().indexOf(q) >= 0) && (!needOnly || finalQty(i) > 0) && (!ncOnly || !isCounted(i) || ncKeep.has(i.id)));
   const row = it => parRow(it, { editQty, editPar, editOrder, mgr, guide });
   if (!list.length) $('parList').innerHTML = '<div class="empty">' + (all.length ? 'No items match.' : 'No items for this vendor.') + '</div>';
   else if (guide) {
@@ -2384,7 +2432,7 @@ function renderPar() {
   let a = '';
   if (!all.length) { $('parActions').innerHTML = ''; return; }
   if (countEditable(s)) {
-    const notCounted = all.filter(i => !hasNum(i.qty) || !i.countedAt).length;
+    const notCounted = ncN;
     a += '<button class="btn primary wide big" id="submitCount" type="button">SUBMIT COUNT</button><p class="note">' + (notCounted ? notCounted + ' item' + (notCounted > 1 ? 's' : '') + ' not counted yet (left as is). ' : '') + 'After you submit, counts lock. Use Request adjustment if something needs fixing.</p>';
   } else if (s.status === 'submitted') {
     a += '<button class="btn wide" id="reqAdj" type="button">Request adjustment</button>';
@@ -2422,11 +2470,11 @@ function parRow(it, o) {
   const sug = suggestedQty(it), fin = finalQty(it), need = fin > 0, np = noPar(it), ovr = hasNum(it.orderQty);
   const autoPart = np ? 'No target – order by hand' + (o.editPar ? ' (or add a target)' : '') : (sug == null ? 'Auto: count first' : 'Auto ' + sug);
   const ovrPart = ovr ? ' · <span class="ovr" data-ovr="1">' + (np && sug == null ? 'set by hand' : 'override (auto ' + esc(autoTxt(sug, np)) + ')') + '</span>' + (o.editOrder ? ' <button class="ulink" type="button" data-act="useauto">' + (np && sug == null ? 'clear' : 'use auto') + '</button>' : '') : '';
-  return '<div class="card pitem' + (need ? ' need' : '') + (np ? ' np' : '') + (ovr ? ' ovrd' : '') + '" data-id="' + esc(it.id) + '"><div class="item-top"><div><div class="item-name">' + esc(it.name) + (need ? '<span class="pill need">Order ' + esc(fin) + '</span>' : '') + '</div>' +
+  return '<div class="card pitem' + (need ? ' need' : '') + (np ? ' np' : '') + (ovr ? ' ovrd' : '') + (isCounted(it) ? '' : ' nc') + '" data-id="' + esc(it.id) + '"><div class="item-top"><div><div class="item-name">' + esc(it.name) + countChip(it) + (need ? '<span class="pill need">Order ' + esc(fin) + '</span>' : '') + '</div>' +
     '<div class="meta">' + (it.itemNo ? '<span class="code">#' + esc(it.itemNo) + '</span> · ' : '') + [it.pack, (o.mgr && (needsUnit(it) || unitOtherOpen[it.id])) ? '' : unitName(it.unit)].filter(Boolean).map(esc).join(' · ') + (o.mgr && !needsUnit(it) && !unitOtherOpen[it.id] ? ' <button class="ulink" type="button" data-act="uedit" aria-label="Edit item (change unit)">edit</button>' : '') + (o.guide && it.sortIndex != null ? ' · guide ' + esc(it.sortIndex) : '') + '</div>' +
     (o.mgr && (needsUnit(it) || unitOtherOpen[it.id]) ? unitPicker(it) : '') +
     (canSeePrices() ? '<div class="pline">' + priceLine(it) + '</div></div><button class="btn small" data-act="hist" aria-label="Price history for ' + esc(it.name) + '">History</button></div>' : '</div></div>') +
-    '<div class="pgrid' + (o.mgr && o.guide ? ' g4' : '') + '">' + numBox('qty', it.qty, '—', 'On hand', o.editQty, o.editQty ? '' : 'Counts locked') +
+    '<div class="pgrid' + (o.mgr && o.guide ? ' g3' : ' g2') + '">' + qtyBox(it, o.editQty) +
     numBox('par', it.par, 'no target', 'Target', o.editPar, o.editPar ? '' : 'Only a manager can change the target') +
     numBox('orderQty', it.orderQty, np ? (sug == null ? 'by hand' : String(sug)) : (sug == null ? '—' : String(sug)), ovr ? 'Order ✎' : 'Order', o.editOrder, o.editOrder ? '' : (o.mgr ? 'Order is complete – locked until reset' : 'Order amounts are set by a manager')) +
     (o.mgr && o.guide ? numBox('sortIndex', it.sortIndex, '—', 'Guide #', true, '') : '') + '</div>' +
@@ -2436,6 +2484,9 @@ function parRow(it, o) {
 $('parBack').onclick = () => go('#');
 $('parSearch').addEventListener('input', () => renderPar());
 $('parNeedOnly').addEventListener('change', () => renderPar());
+/* Not counted filter: an item counted while the filter is on stays in view (so − / + can keep going) until it is toggled. */
+const ncKeep = new Set();
+$('parNcOnly').addEventListener('change', () => { ncKeep.clear(); renderPar(); });
 $('parList').addEventListener('change', e => {
   const us = e.target.closest('select[data-u]'), uo = e.target.closest('input[data-uo]');
   if (us || uo) {
@@ -2450,14 +2501,22 @@ $('parList').addEventListener('change', e => {
   let v = numOrNull(inp.value);
   if (f === 'sortIndex' && v != null && !Number.isNaN(v)) { if (!Number.isInteger(v)) { alert('Guide # must be a whole number (1, 2, 3…).'); inp.value = it.sortIndex ?? ''; return; } }
   if (Number.isNaN(v) || (v != null && v > (f === 'sortIndex' ? 100000 : 1000000))) { alert('Enter a number 0 or more (or leave blank).'); inp.value = hasNum(it[f]) ? it[f] : ''; return; }
-  if ((it[f] ?? null) === v) return;
+  if ((it[f] ?? null) === v && !(f === 'qty' && v != null && !it.countedAt)) return;   /* a reset 0 typed as 0 is a real count */
   if (!canWrite()) return;
-  if (f === 'qty') withStaff(() => run(api().setItemFields(id, { qty: v }, true)));
+  if (f === 'qty') { if ($('parNcOnly').checked) ncKeep.add(id); withStaff(() => run(api().setItemFields(id, { qty: v }, true), 'Saved')); }
   else run(api().setItemFields(id, { [f]: v }, false));
 });
 $('parList').addEventListener('focusout', () => setTimeout(() => { if (parDirty && !editingPar()) { parDirty = false; renderPar(); } }, 0));
 $('parList').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input[data-f], input[data-uo]')) { e.preventDefault(); e.target.blur(); } });
 $('parList').addEventListener('click', e => {
+  const sb = e.target.closest('button[data-step], button[data-act="oos"]');
+  if (sb) {
+    if (sb.disabled) return;
+    const inp = sb.closest('.qcell').querySelector('input[data-f="qty"]'); if (!inp) return;
+    const cur = numOrNull(inp.value), step = Number(sb.getAttribute('data-step') || 0);
+    const next = sb.hasAttribute('data-step') ? Math.max(round2((Number.isNaN(cur) || cur == null ? 0 : cur) + step), 0) : 0;
+    inp.value = String(next); inp.dispatchEvent(new Event('change', { bubbles: true })); return;
+  }
   const b = e.target.closest('button[data-act="hist"]'); if (b) { openHistory(b.closest('.card').getAttribute('data-id')); return; }
   const ua = e.target.closest('button[data-act="useauto"]');
   if (ua) { if (!isMgr() || !canWrite()) return; run(api().setItemFields(ua.closest('.card').getAttribute('data-id'), { orderQty: null }, false), 'Back to the auto amount'); return; }
@@ -2484,6 +2543,8 @@ $('parActions').addEventListener('click', e => {
 });
 function submitCount(v) {
   if (!canWrite()) return;
+  const nc = vendorItems(v.id).filter(i => !isCounted(i)).length;
+  if (nc && !submitCount._ok) { confirmDel(nc + ' item' + (nc === 1 ? '' : 's') + ' not counted. Submit anyway?', () => { submitCount._ok = true; try { submitCount(v); } finally { submitCount._ok = false; } }, 'Submit anyway'); return; }
   const lines = liveLines(v.id), np = noParNoAmount(v.id).length;
   confirmDel('Submit the count for ' + v.name + '? ' + lines.length + ' item' + (lines.length === 1 ? '' : 's') + ' to order' + (np ? ', ' + np + ' no-target item' + (np > 1 ? 's' : '') + ' left to order by hand' : '') + '. Counts lock after submitting. Nothing is ordered.', () =>
     withStaff(n => run(api().submitCount(v.id, lines, n), 'Count submitted. Nothing was ordered.')), 'Submit count');
