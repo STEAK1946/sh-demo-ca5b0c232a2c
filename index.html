@@ -286,6 +286,99 @@ header{top:var(--demo-h);padding-top:12px}
 .modal-bg{top:var(--demo-h)}
 @media (max-width:389px){.demo-banner{font-size:12px;gap:5px}.demo-banner .dtag{font-size:10px;padding:1px 6px}}
 @media (max-width:345px){.demo-banner{font-size:11px}.demo-banner .dtag{display:none}}
+/* COSMETIC-OVERRIDE-START */
+/* COSMETIC OPTION D: mix (A warm base + C steppers/nav + B status rails). CSS only, no logic changes */
+:root{--red:#b3171e;--bg:#fbf4e6;--card:#fffdf8;--line:#ecdcc0;--text:#2a1d14;--muted:#7a6553}
+html,body{background:var(--bg)}
+/* A: warm header, big rounded cards, chunky red primary buttons */
+header{background:var(--red);box-shadow:0 3px 0 #8e1016}
+header h1{font-size:24px;font-weight:900;letter-spacing:.01em}
+header .sub{color:#fde9c8;opacity:1}
+.toolbar h2{font-size:24px;font-weight:900;color:var(--red)}
+.vtitle{font-size:21px!important;color:var(--text)!important}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 2px 0 rgba(122,82,40,.08)}
+.item-name{font-size:19px;font-weight:800}
+.meta{font-size:15px}
+.btn{min-height:52px;border-radius:16px;border:1.5px solid var(--line);background:#fffdf8}
+.btn.primary{background:var(--red);border-color:#8e1016;color:#fff;box-shadow:0 3px 0 #7a0e13;font-weight:900;letter-spacing:.02em}
+.btn.primary:active{transform:translateY(2px);box-shadow:0 1px 0 #7a0e13}
+.vcard .vbtn{min-height:60px;font-size:20px}
+.btn.small{min-height:52px}
+.seg{background:#f1e2c6;border-radius:18px}
+.seg button{min-height:50px;border-radius:14px;color:#6b5136}
+.seg button.on{background:var(--red);color:#fff;box-shadow:0 2px 0 #7a0e13}
+.seg button.on small{color:#fde9c8}
+.fchip{border-color:#e2cfae;background:#fffdf8;min-height:40px;font-weight:600}
+.fchip.on{background:var(--red);border-color:var(--red)}
+/* A: red underlined section headers */
+.section-title{color:var(--red);font-size:16px;font-weight:900;letter-spacing:.06em;border-bottom:3px solid var(--red);padding-bottom:6px;margin:22px 2px 12px}
+.vprog .vpbar{height:12px;background:#efe0c6}
+.vprog .vpfill{background:var(--red)}
+.vprog .vpb{background:#fde7d6;color:#8e1016}
+.sbar{border-radius:16px}.sbar.open{background:#fff8ea;border-color:#e9c9a0}
+input,select{border-radius:14px;border-color:#dcc7a5;background:#fffdf8}
+.card.need{background:#fff6ec;border-color:#e0a26b}
+.pill.need{background:#c2410c}
+.gate{background:var(--bg)}
+.gate .btn.ghost{background:#fffdf8}
+/* B: uppercase status chips (at least A's 13px) */
+.pill{font-size:13px;padding:3px 10px}
+.pill[class*=cs-]{font-weight:900;border-radius:7px;text-transform:uppercase;letter-spacing:.04em}
+.pill.cs-nc{background:#e5e7eb;color:#374151}
+/* C: big -/+ steppers (+ looks the same as -), Out of stock solid red */
+.qstep{gap:8px}
+.qstep .sbtn{min-width:68px;min-height:64px;font-size:38px;font-weight:900;border:2px solid #2a1d14;border-radius:16px;background:#fff;color:#000}
+.qstep input{min-height:64px;font-size:28px;font-weight:900;border-radius:14px;border-width:2px}
+.qstep .oos{min-height:64px;font-size:15px;font-weight:900;border:2px solid #b91c1c;color:#fff;background:#dc2626;border-radius:14px}
+/* C: bottom nav with big icons and solid red active block */
+nav{background:#fffdf8;border-top:3px solid #2a1d14}
+nav button{min-height:72px;font-size:13px;font-weight:800;color:#2a1d14}
+nav button .ic{font-size:28px;line-height:1.2}
+nav button.active{background:var(--red);color:#fff}
+nav .dot{background:#111}
+main{padding-bottom:calc(110px + env(safe-area-inset-bottom))}
+/* B: coloured left rail per status (last so it wins over .card.need) */
+.card.pitem{border-left:8px solid #9ca3af}
+.card.pitem:has(.cs-nc){border-left-color:#9ca3af}
+.card.pitem:has(.cs-ok){border-left-color:#16a34a}
+.card.pitem:has(.cs-low){border-left-color:#f59e0b}
+.card.pitem:has(.cs-out){border-left-color:#dc2626}
+
+/* Manager only: 7 tabs, so a slimmer bar (employee bar above is unchanged) */
+body.is-mgr nav button{min-height:58px;font-size:10.5px;font-weight:800;padding:0;letter-spacing:-.01em;white-space:nowrap;overflow:hidden}
+body.is-mgr nav button .ic{font-size:21px;line-height:1.25}
+body.is-mgr nav .dot{top:3px;right:calc(50% - 20px);font-size:10px;min-width:16px;padding:0 5px}
+body.is-mgr main{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+.chatbar{bottom:calc(75px + env(safe-area-inset-bottom))}
+body.is-mgr .chatbar{bottom:calc(61px + env(safe-area-inset-bottom))}
+/* Help: header button, per-screen ? button, popup, full Help page */
+.hhelp{background:#fffdf8;color:var(--red);border:0;border-radius:999px;font-size:13px;font-weight:900;padding:2px 10px;min-height:24px;cursor:pointer}
+.hrow1{display:flex;gap:6px;align-items:center}
+.qhelp{flex:none;width:40px;height:40px;border-radius:20px;border:2px solid var(--red);background:#fffdf8;color:var(--red);font-size:21px;font-weight:900;line-height:1;padding:0;cursor:pointer;box-shadow:0 2px 0 rgba(122,82,40,.15)}
+.qhelp:active{transform:translateY(1px)}
+#qPop .modal{background:var(--card);position:relative}
+#qPop h3{color:var(--red);font-weight:900;padding-right:46px}
+#qPop ol,#qPop ul{margin:0 0 6px;padding-left:22px;font-size:16px;line-height:1.45}
+#qPop li{margin:4px 0}
+#helpPage{position:fixed;left:0;right:0;bottom:0;top:var(--demo-h,0px);z-index:60;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#helpPage .hbar{position:sticky;top:0;z-index:1;background:var(--red);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 12px;box-shadow:0 3px 0 #8e1016}
+#helpPage .hbar h2{margin:0;font-size:22px;font-weight:900;flex:1}
+#helpPage .hbar button{background:#fffdf8;color:var(--red);border:0;border-radius:14px;min-height:44px;padding:0 14px;font-size:16px;font-weight:900;cursor:pointer}
+#helpPage .hbody{max-width:640px;margin:0 auto;padding:14px 14px 40px}
+#helpPage .hjump{display:flex;gap:8px;margin:0 0 12px}
+#helpPage .hjump a{flex:1;text-align:center;text-decoration:none;background:var(--red);color:#fff;border-radius:14px;padding:12px 6px;font-weight:900;font-size:16px;box-shadow:0 2px 0 #7a0e13}
+#helpPage .hjump a.alt{background:#fffdf8;color:var(--red);border:2px solid var(--red);box-shadow:none}
+#helpPage .hsec{font-size:21px;font-weight:900;color:var(--red);border-bottom:3px solid var(--red);padding-bottom:6px;margin:26px 2px 12px;scroll-margin-top:72px}
+#helpPage .card{scroll-margin-top:72px}
+#helpPage .card h3{margin:0 0 8px;font-size:18px;font-weight:900}
+#helpPage .card ol,#helpPage .card ul{margin:0;padding-left:22px;font-size:16px;line-height:1.5}
+#helpPage .card li{margin:5px 0}
+#helpPage .card p{margin:6px 0;font-size:16px;line-height:1.45}
+#helpPage .tip{background:#fff6ec;border:1.5px solid #e0a26b;border-radius:14px;padding:10px 12px;font-size:15px;margin:10px 0 0}
+#helpPage .mgrnote{background:#fdf2f2;border:1.5px dashed #fca5a5;border-radius:14px;padding:10px 12px;font-size:15px;margin:0 0 12px}
+.gate .hgate{margin-top:10px;background:none;border:0;color:var(--red);font-weight:800;font-size:16px;text-decoration:underline;min-height:44px;cursor:pointer;width:100%}
+
+/* COSMETIC-OVERRIDE-END */
 </style>
 </head>
 <body>
@@ -2931,5 +3024,227 @@ startFirestore().catch(e => {
 });
 window.__storeHub = { get priceDocs() { return Object.keys(itemPrices).length; }, get pricesErr() { return pricesErr; }, rawItem: id => rawItems.find(i => i.id === id) || null, get phStats() { return phStats; }, phCached: id => !!phCache.get(id), openHistory: id => openHistory(id), openService: id => openService(id), setSeg: s => { vSeg = s; renderVendors(); }, finalQty: it => finalQty(it), suggested: it => suggestedQty(it), buildPdf: d => buildPdf(d), pdfData: vid => pdfData(vendorById(vid)), get state() { return state; }, get mode() { return mode; }, get role() { return role; }, get name() { return staff; }, get online() { return liveOnline; }, get uid() { return UID; }, get gate() { return mode === 'gate' ? gatePanel : ''; }, get session() { return session ? session.kind : ''; }, get people() { return people; }, get devUid() { return DEV && DEV.uid; }, idleNow: () => { lastAct = 0; sessionCheck(); }, checkNow: () => sessionCheck() };
 </script>
+<!-- COSMETIC-HELP-START (preview only): Help page, header Help button, per-screen ? popups -->
+<div class="modal-bg hidden" id="qPop" role="dialog" aria-modal="true" aria-labelledby="qPopTitle"><div class="modal">
+  <button type="button" class="xbtn" data-qclose aria-label="Close">×</button>
+  <h3 id="qPopTitle"></h3>
+  <div id="qPopBody"></div>
+  <div class="modal-actions"><button type="button" class="btn" data-qclose>Got it</button><button type="button" class="btn primary" id="qPopMore">Full Help</button></div>
+</div></div>
+
+<template data-q="vendors" data-title="Vendors" data-sec="h-count"><ol>
+  <li>Each card is one vendor. The bar shows how many of its items are counted (for example <b>3/20 counted</b>).</li>
+  <li>Tap <b>On hand</b> on a vendor to start counting its items.</li>
+  <li><b>Service vendors</b> (top switch) are repair and service contacts only. They are not counted.</li>
+</ol></template>
+<template data-q="count" data-title="Counting a vendor" data-sec="h-count"><ol>
+  <li>For each item, tap <b>+</b> or <b>−</b>, or tap the number box and type how many are on hand.</li>
+  <li>None left? Tap <b>Out of stock</b>.</li>
+  <li>Tick <b>Not counted</b> to see only the items you still need to count.</li>
+  <li>When you’re done, tap <b>SUBMIT COUNT</b> at the bottom. Counts lock after that.</li>
+  <li>Made a mistake after submitting? Tap <b>Request adjustment</b>. A manager has to approve it.</li>
+</ol></template>
+<template data-q="order" data-title="Order summary" data-sec="h-m-order"><ul>
+  <li>Shows what is low: <b>target − on hand</b>, never below 0.</li>
+  <li>Nothing is ordered by this app. A manager sets the final amounts and places the order with the vendor.</li>
+</ul></template>
+<template data-q="pdf" data-title="Order PDF" data-sec="h-m-order"><ul>
+  <li>Tap <b>Print / Save as PDF</b> or <b>Download PDF</b>.</li>
+  <li>On iPhone: tap Print, then pinch out on the preview (or tap Share) to save it.</li>
+  <li>Nothing is sent to the vendor by the app.</li>
+</ul></template>
+<template data-q="receive" data-title="Receiving" data-sec="h-receive"><ol>
+  <li>Orders show up here once a manager marks them complete.</li>
+  <li>When the truck comes, tap <b>Check delivery</b> on that order.</li>
+</ol></template>
+<template data-q="check" data-title="Checking a delivery" data-sec="h-receive"><ol>
+  <li>Tick each item as it comes off the truck.</li>
+  <li>Short or damaged? Open <b>Short / damaged</b> and type how many, plus a short note.</li>
+  <li>Tap <b>RECEIVED</b> when you’re done.</li>
+</ol></template>
+<template data-q="items" data-title="Items" data-sec="h-items"><ul>
+  <li>Every item in the store. Search by name or barcode.</li>
+  <li>Running low on something? Tap <b>Request more</b>.</li>
+  <li>To count a vendor’s items, go to <b>Vendors → On hand</b> instead.</li>
+</ul></template>
+<template data-q="requests" data-title="Requests" data-sec="h-items"><ul>
+  <li>Items someone asked for more of.</li>
+  <li>To ask, find the item on the <b>Items</b> tab and tap <b>Request more</b>.</li>
+  <li>A manager marks each one ordered.</li>
+</ul></template>
+<template data-q="chat" data-title="Chat" data-sec="h-chat"><ul>
+  <li>Type in the box at the bottom and tap <b>Send</b>.</li>
+  <li>Everyone using Store Hub sees the messages.</li>
+</ul></template>
+<template data-q="tasks" data-title="Tasks" data-sec="h-chat"><ul>
+  <li>Jobs for the team.</li>
+  <li>Tick the box when a job is done.</li>
+</ul></template>
+<template data-q="people" data-title="People (managers)" data-sec="h-m-people"><ul>
+  <li>Approve new employees, unlock someone after 5 wrong PINs, or reset a PIN.</li>
+  <li>Turning someone off signs their phone out right away.</li>
+  <li>The login log shows the last 50 sign-ins and sign-outs.</li>
+</ul></template>
+
+<div id="helpPage" class="hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="hbar"><h2 id="helpTitle">Help</h2><button type="button" id="helpClose">Close</button></div>
+  <div class="hbody">
+    <div class="hjump"><a href="#h-emp" data-hjump="h-emp">Employees</a><a href="#h-mgr" data-hjump="h-mgr" class="alt">Managers</a></div>
+    <p class="note">Store Hub keeps track of what is on hand at the store. It never orders, sends or pays for anything by itself.</p>
+
+    <div class="hsec" id="h-emp">For employees</div>
+    <div class="card" id="h-signin"><h3>1. Sign in</h3><ol>
+      <li><b>First time on this phone:</b> type the store code and tap <b>Set up phone</b>. You only do this once per phone. Ask a manager for the code.</li>
+      <li><b>Every time after that:</b> tap your name, then type your 4-digit PIN.</li>
+      <li><b>New here?</b> Tap <b>I’m new</b>, type your name and pick a 4-digit PIN. A manager approves you once, in person.</li>
+      <li>Handing the phone to someone else? Tap your name at the top right, then <b>Switch</b>.</li>
+    </ol><p class="tip">5 wrong PINs locks your name. A manager can unlock it or reset your PIN.</p></div>
+
+    <div class="card" id="h-count"><h3>2. Count a vendor</h3><ol>
+      <li>On the <b>Vendors</b> tab, tap <b>On hand</b> on the vendor you’re counting.</li>
+      <li>For each item, tap the big <b>+</b> or <b>−</b> to change the number.</li>
+      <li>Easier to type it? Tap the <b>On hand</b> number box and type the amount.</li>
+      <li>None left on the shelf? Tap <b>Out of stock</b>.</li>
+      <li>Tick <b>Not counted</b> at the top to see only the items you haven’t counted yet.</li>
+      <li>The coloured edge on each item shows its status: green is OK, orange is below target, red is out, grey is not counted.</li>
+      <li>Back on the Vendors list, the badge shows progress, like <b>12/20 counted</b>. It says <b>✓ Finished</b> when every item is done.</li>
+      <li>When you’re done, tap <b>SUBMIT COUNT</b> at the bottom. Items you skipped stay as they were.</li>
+    </ol><p class="tip">Counts save as you go, so it’s OK to stop and come back.</p></div>
+
+    <div class="card" id="h-adjust"><h3>3. Fix a count after submitting</h3><ol>
+      <li>After you submit, the count locks.</li>
+      <li>Tap <b>Request adjustment</b> and say what needs changing (for example “Ricotta is 2 cases, not 1”).</li>
+      <li>A manager has to approve it. Once approved, the count reopens and you can fix it.</li>
+    </ol></div>
+
+    <div class="card" id="h-receive"><h3>4. Receive a delivery</h3><ol>
+      <li>Open the <b>Receive</b> tab. Orders show up here once a manager marks them complete.</li>
+      <li>Tap <b>Check delivery</b> on the order that just came in.</li>
+      <li>Tick each item as it comes off the truck.</li>
+      <li>Short or damaged? Tap <b>Short / damaged</b>, type how many and add a short note.</li>
+      <li>Tap <b>RECEIVED</b>. Items you didn’t tick are treated as not received.</li>
+    </ol></div>
+
+    <div class="card" id="h-items"><h3>5. Ask for more of something</h3><ol>
+      <li>Open the <b>Items</b> tab and search for the item.</li>
+      <li>Tap <b>Request more</b>. It shows up on the <b>Requests</b> tab.</li>
+      <li>A manager marks it ordered.</li>
+    </ol></div>
+
+    <div class="card" id="h-chat"><h3>6. Chat and Tasks</h3><ul>
+      <li><b>Chat:</b> messages go to everyone using Store Hub.</li>
+      <li><b>Tasks:</b> jobs for the team. Tick the box when a job is done.</li>
+    </ul></div>
+
+    <div class="hsec" id="h-mgr">For managers</div>
+    <p class="mgrnote">Manager buttons sit in red dashed <b>MANAGER</b> boxes and the <b>People</b> tab. They only show when a manager is signed in. Employees never see them.</p>
+
+    <div class="card" id="h-m-signin"><h3>1. Manager sign-in</h3><ol>
+      <li>On the sign-in screen, tap <b>Manager login</b>.</li>
+      <li>Type your email and password, then tap <b>Sign in</b>.</li>
+      <li>No login yet? Tap <b>Create a manager login</b>. You need the manager code once.</li>
+      <li>Forgot it? Tap <b>Forgot password</b> to get a reset email.</li>
+    </ol></div>
+
+    <div class="card" id="h-m-review"><h3>2. Review counts</h3><ol>
+      <li>Open a vendor with <b>On hand</b>. After it’s submitted, tap <b>Approve count</b>, or <b>Reopen count</b> if it needs redoing.</li>
+      <li>Adjustment requests show at the top of the Vendors tab. Tap <b>Approve – reopen count</b> or <b>Deny</b>.</li>
+      <li>Set a <b>target</b> for each item on the count screen. Order amounts fill in from it.</li>
+    </ol></div>
+
+    <div class="card" id="h-m-order"><h3>3. Order and PDF</h3><ol>
+      <li>Tap <b>Order summary</b> on a vendor. Amounts are <b>target − on hand</b>; change any amount to override it.</li>
+      <li>Items with no target are listed separately. Order those by hand.</li>
+      <li>Tap <b>Mark order complete</b>. This locks the amounts and sends the order to the Receive tab.</li>
+      <li>Tap <b>PDF / Print</b>, then <b>Print / Save as PDF</b> or <b>Download PDF</b>. On iPhone, pinch out on the print preview (or tap Share) to save it.</li>
+      <li>You place the order with the vendor yourself. The app never sends it.</li>
+    </ol></div>
+
+    <div class="card" id="h-m-reset"><h3>4. After the delivery</h3><ol>
+      <li>Once the delivery is checked in, tap <b>Mark received &amp; reset counts</b>.</li>
+      <li>This sets on hand to 0 for that vendor’s items and starts a fresh count.</li>
+    </ol></div>
+
+    <div class="card" id="h-m-people"><h3>5. People and vendors</h3><ul>
+      <li><b>People</b> tab: approve new employees, unlock after 5 wrong PINs, reset a PIN, or turn someone off.</li>
+      <li><b>+ Vendor</b> and <b>Edit vendor</b> add or change vendors and their contacts.</li>
+      <li>Requests: mark each one ordered when it’s done.</li>
+    </ul></div>
+    <p class="note" style="text-align:center;margin-top:24px"><button type="button" class="btn" id="helpClose2" style="width:100%">Close Help</button></p>
+  </div>
+</div>
+
+<script>
+/* COSMETIC preview only. Help page + per-screen ? popups. No app logic is changed. */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var SCREENS = [ ['vList', 'vendors'], ['vPar', 'count'], ['vDraft', 'order'], ['vPdf', 'pdf'], ['rList', 'receive'], ['rSheet', 'check'],
+    ['tab-inventory', 'items'], ['tab-requests', 'requests'], ['tab-chat', 'chat'], ['tab-tasks', 'tasks'], ['tab-users', 'people'] ];
+  var helpOpen = false, popSec = 'h-emp';
+  function openHelp(sec) {
+    closePop();
+    $('helpPage').classList.remove('hidden');
+    if (!helpOpen) { helpOpen = true; try { history.pushState({ storeHubHelp: 1 }, ''); } catch (e) {} }
+    var t = sec && $(sec); $('helpPage').scrollTop = 0;
+    if (t) setTimeout(function () { t.scrollIntoView({ block: 'start' }); }, 30);
+  }
+  function closeHelp(fromPop) {
+    if (!helpOpen) return; helpOpen = false; $('helpPage').classList.add('hidden');
+    if (!fromPop) { try { if (history.state && history.state.storeHubHelp) history.back(); } catch (e) {} }
+  }
+  function openPop(key) {
+    var tp = document.querySelector('template[data-q="' + key + '"]'); if (!tp) return;
+    $('qPopTitle').textContent = tp.getAttribute('data-title');
+    $('qPopBody').innerHTML = ''; $('qPopBody').appendChild(tp.content.cloneNode(true));
+    popSec = tp.getAttribute('data-sec') || 'h-emp';
+    $('qPop').classList.remove('hidden');
+  }
+  function closePop() { $('qPop').classList.add('hidden'); }
+  window.addEventListener('popstate', function () { if (helpOpen) closeHelp(true); });
+  function init() {
+    // header: Help button next to the status badge
+    var badge = $('modeBadge');
+    if (badge && !$('helpBtn')) {
+      var row = document.createElement('div'); row.className = 'hrow1';
+      badge.parentNode.insertBefore(row, badge);
+      var hb = document.createElement('button'); hb.type = 'button'; hb.id = 'helpBtn'; hb.className = 'hhelp'; hb.textContent = '? Help';
+      hb.setAttribute('aria-label', 'Help');
+      row.appendChild(hb); row.appendChild(badge);
+      hb.addEventListener('click', function () { openHelp(null); });
+    }
+    // sign-in screen: link to the sign-in steps
+    var gb = document.querySelector('#gate .gate-box'), ge = $('gateErr');
+    if (gb && ge && !$('gateHelp')) {
+      var g = document.createElement('button'); g.type = 'button'; g.id = 'gateHelp'; g.className = 'hgate'; g.textContent = 'How do I sign in?';
+      gb.insertBefore(g, ge.nextSibling);
+      g.addEventListener('click', function () { openHelp('h-signin'); });
+    }
+    // one ? button per main screen, in its title bar
+    SCREENS.forEach(function (s) {
+      var sec = $(s[0]); if (!sec) return;
+      var bar = sec.querySelector('.toolbar'); if (!bar || bar.querySelector('.qhelp')) return;
+      var q = document.createElement('button'); q.type = 'button'; q.className = 'qhelp noprint'; q.textContent = '?';
+      q.setAttribute('data-q', s[1]); q.setAttribute('aria-label', 'What is this screen?');
+      var h2 = bar.querySelector('h2');
+      if (h2 && h2.nextSibling) bar.insertBefore(q, h2.nextSibling); else bar.appendChild(q);
+    });
+    document.addEventListener('click', function (e) {
+      var q = e.target.closest && e.target.closest('.qhelp'); if (q) { openPop(q.getAttribute('data-q')); return; }
+      if (e.target.closest && e.target.closest('[data-qclose]')) { closePop(); return; }
+      if (e.target === $('qPop')) closePop();
+    });
+    $('qPopMore').addEventListener('click', function () { openHelp(popSec); });
+    $('helpClose').addEventListener('click', function () { closeHelp(false); });
+    $('helpClose2').addEventListener('click', function () { closeHelp(false); });
+    document.querySelectorAll('[data-hjump]').forEach(function (a) {
+      a.addEventListener('click', function (e) { e.preventDefault(); var t = $(a.getAttribute('data-hjump')); if (t) t.scrollIntoView({ block: 'start' }); });
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (!$('qPop').classList.contains('hidden')) closePop(); else closeHelp(false); } });
+    window.__storeHubHelp = { openHelp: openHelp, openPop: openPop, closePop: closePop, closeHelp: closeHelp };
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+<!-- COSMETIC-HELP-END -->
 </body>
 </html>
