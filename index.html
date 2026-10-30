@@ -289,7 +289,7 @@ header{top:var(--demo-h);padding-top:12px}
     </div>
     <div id="vFood">
       <div id="mgrInbox"></div>
-      <p class="note">Tap <b>Inventory</b> on a vendor, count what is on hand, then tap Submit count. Store Hub never orders, sends or pays anything.</p>
+      <p class="note">Tap <b>On hand</b> on a vendor, count what is on hand, then tap Submit count. Store Hub never orders, sends or pays anything.</p>
       <div id="vendorList"></div>
     </div>
     <div id="vSvc" class="hidden">
@@ -308,7 +308,7 @@ header{top:var(--demo-h);padding-top:12px}
     <div id="parActions"></div>
   </div>
   <div id="vDraft" class="hidden">
-    <div class="toolbar"><button class="btn small" id="draftBack" type="button">&lsaquo; Inventory</button><h2 id="draftTitle" class="vtitle">Order</h2></div>
+    <div class="toolbar"><button class="btn small" id="draftBack" type="button">&lsaquo; On hand</button><h2 id="draftTitle" class="vtitle">Order</h2></div>
     <div class="banner">Nothing is ordered by this app. A manager places the order with the vendor.</div>
     <div id="draftStatus"></div>
     <div id="draftBody"></div>
@@ -346,7 +346,7 @@ header{top:var(--demo-h);padding-top:12px}
     <button class="btn small" id="scanAddBtn">Scan + Add</button>
     <button class="btn small primary" id="addItemBtn">+ Add</button>
   </div>
-  <p class="note">Every item in the store: look things up and tap <b>Request more</b> when you are running low. To count a vendor's items, use <b>Vendors → Inventory</b>.</p>
+  <p class="note">Every item in the store: look things up and tap <b>Request more</b> when you are running low. To count a vendor's items, use <b>Vendors → On hand</b>.</p>
   <input id="invSearch" type="search" placeholder="Search items or barcode" style="margin-bottom:12px">
   <div id="invList"></div>
 </section>
@@ -2125,7 +2125,7 @@ function renderVendorList() {
     if (adj.length) inbox += '<div class="section-title">Adjustment requests (' + adj.length + ')</div>' + adj.map(v => { const s = sessionFor(v.id);
       return '<div class="card adjcard" data-vid="' + esc(v.id) + '"><div class="item-name">' + esc(v.name) + '<span class="pill adj">Adjustment requested</span></div><div class="meta">By ' + esc(s.adjBy) + ' · ' + esc(fmt(s.adjAt)) + '</div>' +
         (s.adjNote ? '<div class="adjnote">“' + esc(s.adjNote) + '”</div>' : '<div class="meta">No note.</div>') +
-        '<div class="actions"><button class="btn small primary" data-act="adjok">Approve – reopen count</button><button class="btn small" data-act="adjno">Deny</button><button class="btn small" data-act="open">Inventory</button></div></div>'; }).join('');
+        '<div class="actions"><button class="btn small primary" data-act="adjok">Approve – reopen count</button><button class="btn small" data-act="adjno">Deny</button><button class="btn small" data-act="open">On hand</button></div></div>'; }).join('');
     if (sub.length) inbox += '<div class="section-title">Counts submitted (' + sub.length + ')</div>' + sub.map(v => { const s = sessionFor(v.id);
       return '<div class="card adjcard" data-vid="' + esc(v.id) + '"><div class="item-name">' + esc(v.name) + '<span class="pill sub">Submitted</span></div><div class="meta">By ' + esc(s.submittedBy) + ' · ' + esc(fmt(s.submittedAt)) + ' · ' + liveLines(v.id).length + ' to order</div>' +
         '<div class="actions"><button class="btn small primary" data-act="order">Review order</button></div></div>'; }).join('');
@@ -2245,13 +2245,13 @@ function vendorCard(v) {
       '<div class="meta helper">No items to count for this vendor yet.</div>' +
       '<div class="actions"><button class="btn vbtn" type="button" data-act="info" aria-label="Contact info for ' + esc(v.name) + '">Contact info</button></div></div>';
   }
-  /* v4.12: the card itself is not a tap target; the one way in is the big "Inventory" button (plus "Order summary"). */
+  /* v4.12: the card itself is not a tap target; the one way in is the big "On hand" button (plus "Order summary"). */
   return '<div class="card vcard" data-vid="' + esc(v.id) + '"><div class="item-top"><div><div class="item-name">' + esc(v.name) + groupChip(v) + statusPill(s) + '</div>' +
     vendorContactLine(v) + '<div class="meta">' + esc(v.supplies || KIND_LABEL[v.kind] || '') + '</div></div>' +
     '<div class="qty">' + its.length + '<br><small>items</small></div></div>' +
     '<div class="meta helper">' + counted + ' of ' + its.length + ' counted · ' + pars + ' with a target · ' + need + ' to order' + (s.exists ? ' · count #' + s.round : '') + '</div>' +
     (countEditable(s) ? '' : '<div class="meta helper vlock">🔒 Counts are locked. You can still look.</div>') +
-    '<div class="actions"><button class="btn primary vbtn" type="button" data-act="inv" aria-label="Inventory for ' + esc(v.name) + '">Inventory</button>' + (isMgr() || need ? '<button class="btn small" type="button" data-act="order">Order summary (' + need + ')</button>' : '') + '</div></div>';
+    '<div class="actions"><button class="btn primary vbtn" type="button" data-act="inv" aria-label="On hand for ' + esc(v.name) + '">On hand</button>' + (isMgr() || need ? '<button class="btn small" type="button" data-act="order">Order summary (' + need + ')</button>' : '') + '</div></div>';
 }
 $('vendorList').addEventListener('click', e => {
   const fc = e.target.closest('button[data-gf]'); if (fc) { vGroupFilter = fc.getAttribute('data-gf'); renderVendorList(); return; }
@@ -2526,12 +2526,12 @@ function renderDraft() {
   const undo = l => editO && l.manual ? ' <button class="ulink" type="button" data-auto="' + esc(l.itemId) + '">' + (l.noPar && l.auto == null ? 'remove' : 'use auto') + '</button>' : '';
   $('draftBody').innerHTML = lines.length ? '<div class="card">' + lines.map(l => '<div class="dline" data-id="' + esc(l.itemId) + '">' + qtyCell(l) + '<span class="dn">' + esc(l.name) + tag(l) + undo(l) + '<span class="meta"> ' + esc([l.pack, l.itemNo ? '#' + l.itemNo : ''].filter(Boolean).join(' · ')) + '</span>' + (mgr ? priceMini(phItem(l.itemId)) : '') + '</span>' + (mgr ? '<span class="dp">' + (l.est.amt != null ? (l.est.approx ? '≈ ' : '') + money(l.est.amt) : '<span class="meta">' + esc(l.est.why) + '</span>') + '</span>' : '') + '</div>').join('') +
     '<div class="dtotal">' + lines.length + ' line' + (lines.length > 1 ? 's' : '') + (mgr && priced.length ? ' · est. ' + (anyApprox ? '≈ ' : '') + money(est) + ' (from unverified invoice-photo prices unless confirmed)' : '') + '</div></div>'
-    : '<div class="empty">Nothing to order yet. On the Inventory screen, enter on-hand counts; items with a target fill in automatically.</div>';
+    : '<div class="empty">Nothing to order yet. Open a vendor's On hand screen and enter the counts; items with a target fill in automatically.</div>';
   const zo = frozen(s) ? [] : zeroedOverrides(v.id);
   if (zo.length) $('draftBody').innerHTML += '<div class="section-title">Set to 0 by a manager (' + zo.length + ')</div><div class="card" id="draftZero">' + zo.map(i => '<div class="dline" data-id="' + esc(i.id) + '"><span class="dq">0</span><span class="dn">' + esc(i.name) + ' <span class="pill kind ovr" data-ovr="1">override · auto ' + esc(suggestedQty(i)) + '</span>' + (editO ? ' <button class="ulink" type="button" data-auto="' + esc(i.id) + '">use auto</button>' : '') + '</span></div>').join('') + '</div>';
   phScan($('draftBody'));
   const np = noParNoAmount(v.id);
-  $('draftNoPar').innerHTML = !frozen(s) && np.length ? '<div class="section-title">No target – order by hand (' + np.length + ')</div><p class="note">These items have no target, so no amount is filled in automatically.' + (mgr ? ' Add a target on the Inventory screen to have it filled in automatically, or type an amount in its Order box to order it by hand.' : ' A manager adds a target or an amount by hand.') + '</p><div class="card">' + np.map(i => '<div class="dline"><span class="dq">—</span><span class="dn">' + esc(i.name) + '<span class="meta"> ' + esc([i.pack, i.itemNo ? '#' + i.itemNo : ''].filter(Boolean).join(' · ')) + ' · on hand ' + (hasNum(i.qty) ? esc(i.qty) : 'not counted') + '</span></span></div>').join('') + '</div>' : '';
+  $('draftNoPar').innerHTML = !frozen(s) && np.length ? '<div class="section-title">No target – order by hand (' + np.length + ')</div><p class="note">These items have no target, so no amount is filled in automatically.' + (mgr ? ' Add a target on the vendor's On hand screen to have it filled in automatically, or type an amount in its Order box to order it by hand.' : ' A manager adds a target or an amount by hand.') + '</p><div class="card">' + np.map(i => '<div class="dline"><span class="dq">—</span><span class="dn">' + esc(i.name) + '<span class="meta"> ' + esc([i.pack, i.itemNo ? '#' + i.itemNo : ''].filter(Boolean).join(' · ')) + ' · on hand ' + (hasNum(i.qty) ? esc(i.qty) : 'not counted') + '</span></span></div>').join('') + '</div>' : '';
   $('draftText').textContent = draftText(v, lines, s);
   let a = '';
   if (mgr) {
