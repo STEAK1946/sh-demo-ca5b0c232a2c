@@ -239,13 +239,12 @@ body:not(.is-logins) .logins-only{display:none!important}
 .rov{min-height:46px;display:flex;align-items:center;justify-content:center;gap:4px;border:1px dashed #d1d5db;border-radius:10px;background:#f9fafb;font-size:18px;font-weight:700}
 .lock{font-size:13px;opacity:.8}
 .pgrid.g4{grid-template-columns:repeat(4,1fr)}
-/* preview2: On hand stepper (− / number / +), Out of stock, item status chips, not-counted filter, vendor progress badge */
+/* preview2: On hand stepper (− / number / +), item status chips, not-counted filter, vendor progress badge */
 .pgrid.g2{grid-template-columns:repeat(2,1fr)}.pgrid.g3{grid-template-columns:repeat(3,1fr)}
 .pgrid .qcell{grid-column:1/-1}
 .qstep{display:flex;gap:6px;align-items:stretch}
 .qstep .sbtn{min-width:54px;min-height:50px;font-size:26px;font-weight:700;padding:0;line-height:1;border-radius:12px}
 .qstep input,.qstep .rov{flex:1;min-width:0;min-height:50px;font-size:20px}
-.qstep .oos{min-height:50px;font-size:13px;font-weight:700;padding:0 10px;white-space:nowrap;color:#b91c1c;border-color:#fca5a5;background:#fff5f5}
 .qstep button:disabled{opacity:.4}
 .pill.cs-nc{background:#e5e7eb;color:#4b5563}.pill.cs-out{background:#dc2626;color:#fff}.pill.cs-low{background:#f59e0b;color:#fff}.pill.cs-ok{background:#16a34a;color:#fff}
 .pitem.nc{border-left:4px solid #9ca3af}
@@ -325,11 +324,10 @@ input,select{border-radius:14px;border-color:#dcc7a5;background:#fffdf8}
 .pill{font-size:13px;padding:3px 10px}
 .pill[class*=cs-]{font-weight:900;border-radius:7px;text-transform:uppercase;letter-spacing:.04em}
 .pill.cs-nc{background:#e5e7eb;color:#374151}
-/* C: big -/+ steppers (+ looks the same as -), Out of stock solid red */
+/* C: big -/+ steppers (+ looks the same as -) */
 .qstep{gap:8px}
 .qstep .sbtn{min-width:68px;min-height:64px;font-size:38px;font-weight:900;border:2px solid #2a1d14;border-radius:16px;background:#fff;color:#000}
 .qstep input{min-height:64px;font-size:28px;font-weight:900;border-radius:14px;border-width:2px}
-.qstep .oos{min-height:64px;font-size:15px;font-weight:900;border:2px solid #b91c1c;color:#fff;background:#dc2626;border-radius:14px}
 /* C: bottom nav with big icons and solid red active block */
 nav{background:#fffdf8;border-top:3px solid #2a1d14}
 nav button{min-height:72px;font-size:13px;font-weight:800;color:#2a1d14}
@@ -2460,7 +2458,7 @@ function countChip(it) {
   if (hasNum(it.par) && q < Number(it.par)) return '<span class="pill cs-low">Below target</span>';
   return '<span class="pill cs-ok">OK</span>';
 }
-/* On hand box with − / + and Out of stock. The input stays a plain number field; the buttons only set its value and fire
+/* On hand box with − / +. The input stays a plain number field; the buttons only set its value and fire
    the same "change" the keyboard does, so saving goes through the one qty handler below. Locked: read-only + disabled. */
 function qtyBox(it, editable) {
   const dis = editable ? '' : ' disabled', nm = esc(it.name);
@@ -2470,8 +2468,7 @@ function qtyBox(it, editable) {
     : '<div class="rov" data-ro="qty" title="Counts locked"><span class="lock" aria-label="locked">🔒</span>' + (hasNum(it.qty) ? esc(it.qty) : '<span class="meta">—</span>') + '</div>';
   return '<div class="qcell"><label>On hand</label><div class="qstep">' +
     '<button class="btn sbtn" type="button" data-step="-1" aria-label="One less ' + nm + '"' + dis + '>−</button>' + mid +
-    '<button class="btn sbtn" type="button" data-step="1" aria-label="One more ' + nm + '"' + dis + '>+</button>' +
-    '<button class="btn oos" type="button" data-act="oos" aria-label="Out of stock: ' + nm + '"' + dis + '>Out of<br>stock</button></div></div>';
+    '<button class="btn sbtn" type="button" data-step="1" aria-label="One more ' + nm + '"' + dis + '>+</button></div></div>';
 }
 function statusBanner(v, s) {
   const by = (n, t) => (n ? ' by ' + esc(n) : '') + (t ? ' · ' + esc(fmt(t)) : '');
@@ -2602,12 +2599,12 @@ $('parList').addEventListener('change', e => {
 $('parList').addEventListener('focusout', () => setTimeout(() => { if (parDirty && !editingPar()) { parDirty = false; renderPar(); } }, 0));
 $('parList').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input[data-f], input[data-uo]')) { e.preventDefault(); e.target.blur(); } });
 $('parList').addEventListener('click', e => {
-  const sb = e.target.closest('button[data-step], button[data-act="oos"]');
+  const sb = e.target.closest('button[data-step]');
   if (sb) {
     if (sb.disabled) return;
     const inp = sb.closest('.qcell').querySelector('input[data-f="qty"]'); if (!inp) return;
     const cur = numOrNull(inp.value), step = Number(sb.getAttribute('data-step') || 0);
-    const next = sb.hasAttribute('data-step') ? Math.max(round2((Number.isNaN(cur) || cur == null ? 0 : cur) + step), 0) : 0;
+    const next = Math.max(round2((Number.isNaN(cur) || cur == null ? 0 : cur) + step), 0);
     inp.value = String(next); inp.dispatchEvent(new Event('change', { bubbles: true })); return;
   }
   const b = e.target.closest('button[data-act="hist"]'); if (b) { openHistory(b.closest('.card').getAttribute('data-id')); return; }
@@ -3039,7 +3036,6 @@ window.__storeHub = { get priceDocs() { return Object.keys(itemPrices).length; }
 </ol></template>
 <template data-q="count" data-title="Counting a vendor" data-sec="h-count"><ol>
   <li>For each item, tap <b>+</b> or <b>−</b>, or tap the number box and type how many are on hand.</li>
-  <li>None left? Tap <b>Out of stock</b>.</li>
   <li>Tick <b>Not counted</b> to see only the items you still need to count.</li>
   <li>When you’re done, tap <b>SUBMIT COUNT</b> at the bottom. Counts lock after that.</li>
   <li>Made a mistake after submitting? Tap <b>Request adjustment</b>. A manager has to approve it.</li>
@@ -3104,7 +3100,6 @@ window.__storeHub = { get priceDocs() { return Object.keys(itemPrices).length; }
       <li>On the <b>Vendors</b> tab, tap <b>On hand</b> on the vendor you’re counting.</li>
       <li>For each item, tap the big <b>+</b> or <b>−</b> to change the number.</li>
       <li>Easier to type it? Tap the <b>On hand</b> number box and type the amount.</li>
-      <li>None left on the shelf? Tap <b>Out of stock</b>.</li>
       <li>Tick <b>Not counted</b> at the top to see only the items you haven’t counted yet.</li>
       <li>The coloured edge on each item shows its status: green is OK, orange is below target, red is out, grey is not counted.</li>
       <li>Back on the Vendors list, the badge shows progress, like <b>12/20 counted</b>. It says <b>✓ Finished</b> when every item is done.</li>
